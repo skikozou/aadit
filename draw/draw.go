@@ -2,6 +2,7 @@ package draw
 
 import (
 	"fmt"
+	"strings"
 
 	"aadit/canvas"
 	"aadit/command"
@@ -63,8 +64,14 @@ func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup
 
 	// ---- ポップアップ ----
 	if pop.Visible {
-		w := len(pop.Message) + 4
-		h := 3
+		lines := strings.Split(pop.Message, "\n")
+		w := 4
+		h := 2+len(lines)
+		for _, l := range lines {
+			if len(l)+4 > w {
+				w = len(l)+4
+			}
+		}
 		px := (sw - w) / 2
 		py := (sh - h) / 2
 
@@ -77,19 +84,23 @@ func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup
 			s.SetContent(px+x, py, '─', nil, style)
 			s.SetContent(px+x, py+h-1, '─', nil, style)
 		}
-		for y := 0; y < h; y++ {
-			s.SetContent(px, py+y, '│', nil, style)
-			s.SetContent(px+w-1, py+y, '│', nil, style)
-		}
 		s.SetContent(px, py, '┌', nil, style)
 		s.SetContent(px+w-1, py, '┐', nil, style)
 		s.SetContent(px, py+h-1, '└', nil, style)
 		s.SetContent(px+w-1, py+h-1, '┘', nil, style)
 
-		s.SetContent(px+1, py+1, ' ', nil, style)
-		s.SetContent(px+w-2, py+1, ' ', nil, style)
-		for i, r := range pop.Message {
-			s.SetContent(px+2+i, py+1, r, nil, style)
+		for n, ms := range lines {
+			s.SetContent(px, py+n+1, '│', nil, style)
+			s.SetContent(px+w-1, py+n+1, '│', nil, style)
+			s.SetContent(px+1, py+n+1, ' ', nil, style)
+			s.SetContent(px+w-2, py+n+1, ' ', nil, style)
+			for i := 0; i < w-4; i++ {
+				if len(ms) > i {
+					s.SetContent(px+2+i, py+1+n, rune(ms[i]), nil, style)
+				} else {
+					s.SetContent(px+2+i, py+1+n, ' ', nil, style)
+				}
+			}
 		}
 	}
 

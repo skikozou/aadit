@@ -1,13 +1,33 @@
 package command
 
+import (
+	"fmt"
+	"github.com/google/shlex"
+	)
+
 type Console struct {
 	Visible bool
 	Buffer  []rune
+	Functions map[string]Function
 }
+
+type Function func([]string) string
 
 func NewConsole() *Console {
 	return &Console{
 		Buffer: make([]rune, 0),
+		Functions: map[string]Function{
+					"fill": func (args []string) string {
+					        	if len(args) < 2 {
+					        		return "missing args"
+					        	}
+					
+					        	return fmt.Sprintf("Filled %s", args[1])
+					        },
+					"help": func ([]string) string {
+						return "help message\nmaybe"
+					},
+				},
 	}
 }
 
@@ -27,13 +47,20 @@ func (c *Console) Backspace() {
 }
 
 func (c *Console) Execute() string {
-	cmd := string(c.Buffer)
+	parts, _ := shlex.Split(string(c.Buffer))
 	c.Buffer = c.Buffer[:0]
+	var message string
 
-	if cmd == "" {
+	if len(parts) < 1 {
 		return "empty command"
 	}
 
-	// 今はダミー
-	return "executed: " + cmd
+	cmdFunc := c.Functions[parts[0]]
+	if cmdFunc == nil {
+		return "unkown command: " + parts[0]
+	}
+
+	message = cmdFunc(parts)
+
+	return message
 }

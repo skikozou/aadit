@@ -4,6 +4,7 @@ go 1.25.4
 
 require (
 	github.com/gdamore/tcell/v2 v2.13.2
+	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/jroimartin/gocui v0.5.0
 	github.com/sirupsen/logrus v1.9.3
 )
