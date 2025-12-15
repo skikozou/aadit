@@ -77,11 +77,17 @@ func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup
 			s.SetContent(px+x, py, '─', nil, style)
 			s.SetContent(px+x, py+h-1, '─', nil, style)
 		}
+		for y := 0; y < h; y++ {
+			s.SetContent(px, py+y, '│', nil, style)
+			s.SetContent(px+w-1, py+y, '│', nil, style)
+		}
 		s.SetContent(px, py, '┌', nil, style)
 		s.SetContent(px+w-1, py, '┐', nil, style)
 		s.SetContent(px, py+h-1, '└', nil, style)
 		s.SetContent(px+w-1, py+h-1, '┘', nil, style)
 
+		s.SetContent(px+1, py+1, ' ', nil, style)
+		s.SetContent(px+w-2, py+1, ' ', nil, style)
 		for i, r := range pop.Message {
 			s.SetContent(px+2+i, py+1, r, nil, style)
 		}
@@ -93,7 +99,7 @@ func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup
 	}
 
 	// 右下（キャンバスサイズ）
-	rs := fmt.Sprintf("%d×%d", cv.Width, cv.Height)
+	rs := fmt.Sprintf("%dx%d", cv.Width, cv.Height)
 	for i, r := range rs {
 		s.SetContent(sw-len(rs)+i, sh-1, r, nil, tcell.StyleDefault)
 	}
