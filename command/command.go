@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"github.com/google/shlex"
 	)
 
@@ -16,18 +15,7 @@ type Function func([]string) string
 func NewConsole() *Console {
 	return &Console{
 		Buffer: make([]rune, 0),
-		Functions: map[string]Function{
-					"fill": func (args []string) string {
-					        	if len(args) < 2 {
-					        		return "missing args"
-					        	}
-					
-					        	return fmt.Sprintf("Filled %s", args[1])
-					        },
-					"help": func ([]string) string {
-						return "help message\nmaybe"
-					},
-				},
+		Functions: map[string]Function{},
 	}
 }
 

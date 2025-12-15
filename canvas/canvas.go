@@ -20,12 +20,7 @@ func NewCanvas(w, h int) *Canvas {
 }
 
 func (c *Canvas) PutChar(r rune) {
-	if c.CX >= 0 && c.CX < c.Width && c.CY >= 0 && c.CY < c.Height {
-		c.Data[c.CY][c.CX] = r
-	}
-	if c.CX+1 < c.Width {
-		c.CX++
-	}
+	c.Data[c.CY][c.CX] = r
 }
 
 func (c *Canvas) MoveCursor(dx, dy int) {
@@ -40,15 +35,20 @@ func (c *Canvas) MoveCursor(dx, dy int) {
 }
 
 func (c *Canvas) Backspace() {
-	if c.CX > 0 {
-		c.CX--
-		c.Data[c.CY][c.CX] = ' '
-	}
+	c.Data[c.CY][c.CX] = ' '
 }
 
 func (c *Canvas) Enter() {
 	if c.CY+1 < c.Height {
 		c.CY++
 		c.CX = 0
+	}
+}
+
+func (c *Canvas) Fill(text string) {
+	for i := range c.Data {
+		for j := range c.Data[i] {
+			c.Data[i][j] = rune(text[(i*len(c.Data)+j)%(len(text))])
+		}
 	}
 }

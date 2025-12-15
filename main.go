@@ -2,6 +2,7 @@ package main
 
 import (
         "os"
+        "fmt"
         "strconv"
         "strings"
         "aadit/canvas"
@@ -65,6 +66,21 @@ func main() {
         cv := canvas.NewCanvas(cw, ch)
         con := command.NewConsole()
         pop := popup.New()
+
+        con.Functions = map[string]command.Function{
+        	"fill": func (args []string) string {
+	        	if len(args) < 2 {
+	        		return "missing args"
+	        	}
+
+	        	cv.Fill(args[1])
+				
+	        	return fmt.Sprintf("Filled %s", args[1])
+	        },
+			"help": func ([]string) string {
+				return "help - show this message\nfill [text] - fill canvas by text"
+			},
+        }
 
         for {
                 draw.DrawAll(s, cv, con, pop)
