@@ -54,7 +54,7 @@ func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup
 		y := cy + cv.Height + 1
 		s.SetContent(cx-1, y, '>', nil, style)
 
-		for i := 0; i < cv.Width; i++ {
+		for i := 0; i < cv.Width+1; i++ {
 			ch := ' '
 			if i < len(con.Buffer) {
 				ch = con.Buffer[i]
