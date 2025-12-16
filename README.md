@@ -12,25 +12,27 @@ go install .
 # Usage
 ### Start
 ```
+aadit
+// or
 aadit {width} {height}
-or
+// or
 aadit {width}x{height}
 ```
 
 ### Move
 ```
-allow key ←→↑↓
+// use allow key ←→↑↓
 ```
 
 ### Write
 ```
-type character
+// type character
 ```
 
 ### Console
 ```
 ctrl + "/"
-type "help" and check commands
+// type "help" and check commands
 ```
 
 # For Developer
