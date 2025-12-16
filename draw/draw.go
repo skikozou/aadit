@@ -6,13 +6,14 @@ import (
 
 	"aadit/canvas"
 	"aadit/command"
+	"aadit/dialog"
 	"aadit/popup"
 	"aadit/screen"
 
 	"github.com/gdamore/tcell/v2"
 )
 
-func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup.Popup) {
+func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup.Popup, dlg *dialog.Dialog) {
 	s.Clear()
 
 	sw, sh := screen.Size(s)
@@ -62,14 +63,63 @@ func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup
 		}
 	}
 
+	// ---- ダイアログ ----
+	if dlg.Visible {
+		w := 40
+		if len(dlg.Prompt)+4 > w {
+			w = len(dlg.Prompt) + 4
+		}
+		h := 4
+		px := (sw - w) / 2
+		py := (sh - h) / 2
+
+		style := tcell.StyleDefault.
+			Background(tcell.ColorWhite).
+			Foreground(tcell.ColorBlack)
+
+		// 枠
+		for x := 0; x < w; x++ {
+			s.SetContent(px+x, py, '─', nil, style)
+			s.SetContent(px+x, py+h-1, '─', nil, style)
+		}
+		s.SetContent(px, py, '┌', nil, style)
+		s.SetContent(px+w-1, py, '┐', nil, style)
+		s.SetContent(px, py+h-1, '└', nil, style)
+		s.SetContent(px+w-1, py+h-1, '┘', nil, style)
+
+		// 側面
+		for y := 1; y < h-1; y++ {
+			s.SetContent(px, py+y, '│', nil, style)
+			s.SetContent(px+w-1, py+y, '│', nil, style)
+		}
+
+		// プロンプト
+		for i := 0; i < w-4; i++ {
+			if i < len(dlg.Prompt) {
+				s.SetContent(px+2+i, py+1, rune(dlg.Prompt[i]), nil, style)
+			} else {
+				s.SetContent(px+2+i, py+1, ' ', nil, style)
+			}
+		}
+
+		// 入力欄
+		for i := 0; i < w-4; i++ {
+			if i < len(dlg.Buffer) {
+				s.SetContent(px+2+i, py+2, dlg.Buffer[i], nil, style)
+			} else {
+				s.SetContent(px+2+i, py+2, ' ', nil, style)
+			}
+		}
+	}
+
 	// ---- ポップアップ ----
 	if pop.Visible {
 		lines := strings.Split(pop.Message, "\n")
 		w := 4
-		h := 2+len(lines)
+		h := 2 + len(lines)
 		for _, l := range lines {
 			if len(l)+4 > w {
-				w = len(l)+4
+				w = len(l) + 4
 			}
 		}
 		px := (sw - w) / 2

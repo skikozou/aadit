@@ -48,7 +48,7 @@ func (c *Canvas) Enter() {
 func (c *Canvas) Fill(text string) {
 	for i := range c.Data {
 		for j := range c.Data[i] {
-			c.Data[i][j] = rune(text[(i*len(c.Data)+j)%(len(text))])
+			c.Data[i][j] = rune(text[(i*c.Width+j)%(len(text))])
 		}
 	}
 }

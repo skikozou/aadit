@@ -5,11 +5,12 @@ import (
 	"aadit/command"
 	"aadit/canvas"
 	"aadit/popup"
+	"aadit/dialog"
 	
 	"github.com/gdamore/tcell/v2"
 )
 
-func Customize(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup.Popup) {
+func Customize(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup.Popup, dlg *dialog.Dialog) {
 	con.Functions = map[string]command.Function{
  		"fill": func (args []string) string {
 		   	if len(args) < 2 {
@@ -22,6 +23,11 @@ func Customize(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *pop
 	    },
 		"help": func ([]string) string {
 			return "help - show this message\nfill [text] - fill canvas by text"
+		},
+		"dlg": func ([]string) string {
+			
+		
+			return ""
 		},
 	}
 }

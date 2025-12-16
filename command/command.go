@@ -37,7 +37,6 @@ func (c *Console) Backspace() {
 func (c *Console) Execute() string {
 	parts, _ := shlex.Split(string(c.Buffer))
 	c.Buffer = c.Buffer[:0]
-	var message string
 
 	if len(parts) < 1 {
 		return "empty command"
@@ -45,10 +44,8 @@ func (c *Console) Execute() string {
 
 	cmdFunc := c.Functions[parts[0]]
 	if cmdFunc == nil {
-		return "unkown command: " + parts[0]
+		return "unknown command: " + parts[0]
 	}
 
-	message = cmdFunc(parts)
-
-	return message
+	return cmdFunc(parts)
 }

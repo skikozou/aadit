@@ -3,16 +3,34 @@ package input
 import (
 	"aadit/canvas"
 	"aadit/command"
+	"aadit/dialog"
 	"aadit/popup"
 
 	"github.com/gdamore/tcell/v2"
 )
 
-func HandleEvent(ev *tcell.EventKey, cv *canvas.Canvas, con *command.Console, pop *popup.Popup) bool {
+func HandleEvent(ev *tcell.EventKey, cv *canvas.Canvas, con *command.Console, pop *popup.Popup, dlg *dialog.Dialog) bool {
 
 	// Ctrl + /
 	if ev.Key() == tcell.KeyCtrlUnderscore {
 		con.Toggle()
+		return true
+	}
+
+	// ダイアログ表示中の処理
+	if dlg.Visible {
+		switch ev.Key() {
+		case tcell.KeyEscape:
+			dlg.Hide()
+		case tcell.KeyEnter:
+			// ダイアログの結果を返すために、何らかのコールバックが必要
+			// ここではとりあえずHideするだけ
+			return true
+		case tcell.KeyBackspace, tcell.KeyBackspace2:
+			dlg.Backspace()
+		case tcell.KeyRune:
+			dlg.InputRune(ev.Rune())
+		}
 		return true
 	}
 
@@ -31,7 +49,9 @@ func HandleEvent(ev *tcell.EventKey, cv *canvas.Canvas, con *command.Console, po
 			con.Toggle()
 		case tcell.KeyEnter:
 			result := con.Execute()
-			pop.Show(result)
+			if result != "" {
+				pop.Show(result)
+			}
 		case tcell.KeyBackspace, tcell.KeyBackspace2:
 			con.Backspace()
 		case tcell.KeyRune:

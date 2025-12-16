@@ -5,12 +5,13 @@ import (
         "strconv"
         "strings"
         "aadit/canvas"
+        "aadit/command"
+        "aadit/dialog"
         "aadit/draw"
         "aadit/input"
         "aadit/logger"
-        "aadit/screen"
-        "aadit/command"
         "aadit/popup"
+        "aadit/screen"
 
         "github.com/gdamore/tcell/v2"
 )
@@ -65,16 +66,17 @@ func main() {
         cv := canvas.NewCanvas(cw, ch)
         con := command.NewConsole()
         pop := popup.New()
+        dlg := dialog.New()
 
-        Customize(s, cv, con, pop)
+        Customize(s, cv, con, pop, dlg)
 
         for {
-                draw.DrawAll(s, cv, con, pop)
+                draw.DrawAll(s, cv, con, pop, dlg)
 
                 ev := s.PollEvent()
                 switch e := ev.(type) {
                 case *tcell.EventKey:
-                        if !input.HandleEvent(e, cv, con, pop) {
+                        if !input.HandleEvent(e, cv, con, pop, dlg) {
                                 return
                         }
                 }
