@@ -21,9 +21,9 @@ func HandleEvent(ev *tcell.EventKey, cv *canvas.Canvas, con *command.Console, po
 	if dlg.Visible {
 		switch ev.Key() {
 		case tcell.KeyEscape:
-			dlg.Hide()
+			dlg.Cancel()
 		case tcell.KeyEnter:
-			dlg.Hide()
+			dlg.Submit()
 		case tcell.KeyBackspace, tcell.KeyBackspace2:
 			dlg.Backspace()
 		case tcell.KeyRune:
