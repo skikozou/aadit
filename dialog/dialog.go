@@ -1,3 +1,10 @@
+// ===================
+//       Waring!
+// ===================
+//
+// This system is not supported
+//
+
 package dialog
 
 type Dialog struct {

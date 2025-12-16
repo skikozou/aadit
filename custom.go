@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"aadit/canvas"
 	"aadit/command"
@@ -13,19 +14,56 @@ import (
 
 func Customize(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup.Popup, dlg *dialog.Dialog) {
 	con.Functions = map[string]command.Function{
+		"save": func (args []string) string {
+			// format: save [filepath]
+			if len(args) < 2 {
+				return "Usage: save <filename>"
+			}
+			
+			err := saveCanvas(cv, args[1])
+			if err != nil {
+				return fmt.Sprintf("Error: %v", err)
+			}
+			return fmt.Sprintf("Saved to %s", args[1])
+		},
+
+		"load": func (args []string) string {
+			// format: load [filepath]
+			if len(args) < 2 {
+				return "Usage: load <filename>"
+			}
+			
+			err := loadCanvas(cv, args[1])
+			if err != nil {
+				return fmt.Sprintf("Error: %v", err)
+			}
+			return fmt.Sprintf("Loaded from %s", args[1])
+		},
+		
  		"fill": func (args []string) string {
+ 			// format: fill [text]
 		   	if len(args) < 2 {
-		   		return "missing args"
+				return "Usage: fill <text>"
 		   	}
 		    cv.Fill(args[1])
-		    return fmt.Sprintf("Filled %s", args[1])
+		    return fmt.Sprintf("Filled with '%s'", args[1])
 	    },
 		
 		"help": func ([]string) string {
-			return "help - show this message\nfill [text] - fill canvas with repeating text\nclear - clear the canvas\nrect - draw a rectangle\nline - draw a line\nbox - draw a box with borders"
+ 			// format: help
+			return "Available commands:\n" +
+				"help - show this message\n" +
+				"save <file> - save canvas to file\n" +
+				"load <file> - load canvas from file\n" +
+				"fill <text> - fill canvas with text\n" +
+				"clear - clear the canvas\n" +
+				"rect <x> <y> <w> <h> <c> - draw rectangle\n" +
+				"line <x1> <y1> <x2> <y2> <c> - draw line\n" +
+				"box <x> <y> <w> <h> - draw bordered box"
 		},
 		
 		"clear": func ([]string) string {
+ 			// format: clear
 			for i := range cv.Data {
 				for j := range cv.Data[i] {
 					cv.Data[i][j] = ' '
@@ -34,114 +72,144 @@ func Customize(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *pop
 			return "Canvas cleared"
 		},
 		
-		"rect": func ([]string) string {
-			dlg.Show("x y width height char:", func(input string) {
-				parts := splitInput(input)
-				if len(parts) < 5 {
-					pop.Show("Error: need 5 arguments (x y width height char)")
-					return
-				}
-				
-				x, err1 := strconv.Atoi(parts[0])
-				y, err2 := strconv.Atoi(parts[1])
-				w, err3 := strconv.Atoi(parts[2])
-				h, err4 := strconv.Atoi(parts[3])
-				
-				if err1 != nil || err2 != nil || err3 != nil || err4 != nil {
-					pop.Show("Error: invalid number format")
-					return
-				}
-				
-				char := rune(parts[4][0])
-				
-				for dy := 0; dy < h; dy++ {
-					for dx := 0; dx < w; dx++ {
-						nx, ny := x+dx, y+dy
-						if nx >= 0 && nx < cv.Width && ny >= 0 && ny < cv.Height {
-							cv.Data[ny][nx] = char
-						}
-					}
-				}
-				
-				pop.Show(fmt.Sprintf("Drew rectangle at (%d,%d) size %dx%d", x, y, w, h))
-			})
-			return ""
+		"rect": func (args []string) string {
+ 			// format: rect <x> <y> <w> <h> <char>
+			if len(args) < 6 {
+				return "Usage: rect <x> <y> <w> <h> <char>"
+			}
+			
+			x, err1 := strconv.Atoi(args[1])
+			y, err2 := strconv.Atoi(args[2])
+			w, err3 := strconv.Atoi(args[3])
+			h, err4 := strconv.Atoi(args[4])
+			
+			if err1 != nil || err2 != nil || err3 != nil || err4 != nil {
+				return "Error: invalid number format"
+			}
+			
+			char := rune(args[5][0])
+			drawRect(cv, x, y, w, h, char)
+			
+			return fmt.Sprintf("Rectangle at (%d,%d) %dx%d", x, y, w, h)
 		},
 		
-		"line": func ([]string) string {
-			dlg.Show("x1 y1 x2 y2 char:", func(input string) {
-				parts := splitInput(input)
-				if len(parts) < 5 {
-					pop.Show("Error: need 5 arguments (x1 y1 x2 y2 char)")
-					return
-				}
-				
-				x1, err1 := strconv.Atoi(parts[0])
-				y1, err2 := strconv.Atoi(parts[1])
-				x2, err3 := strconv.Atoi(parts[2])
-				y2, err4 := strconv.Atoi(parts[3])
-				
-				if err1 != nil || err2 != nil || err3 != nil || err4 != nil {
-					pop.Show("Error: invalid number format")
-					return
-				}
-				
-				char := rune(parts[4][0])
-				
-				drawLine(cv, x1, y1, x2, y2, char)
-				
-				pop.Show(fmt.Sprintf("Drew line from (%d,%d) to (%d,%d)", x1, y1, x2, y2))
-			})
-			return ""
+		"line": func (args []string) string {
+ 			// format: line <x1> <y1> <x2> <y2> <char>
+			if len(args) < 6 {
+				return "Usage: line <x1> <y1> <x2> <y2> <char>"
+			}
+			
+			x1, err1 := strconv.Atoi(args[1])
+			y1, err2 := strconv.Atoi(args[2])
+			x2, err3 := strconv.Atoi(args[3])
+			y2, err4 := strconv.Atoi(args[4])
+			
+			if err1 != nil || err2 != nil || err3 != nil || err4 != nil {
+				return "Error: invalid number format"
+			}
+			
+			char := rune(args[5][0])
+			drawLine(cv, x1, y1, x2, y2, char)
+			
+			return fmt.Sprintf("Line from (%d,%d) to (%d,%d)", x1, y1, x2, y2)
 		},
 		
-		"box": func ([]string) string {
-			dlg.Show("x y width height:", func(input string) {
-				parts := splitInput(input)
-				if len(parts) < 4 {
-					pop.Show("Error: need 4 arguments (x y width height)")
-					return
-				}
-				
-				x, err1 := strconv.Atoi(parts[0])
-				y, err2 := strconv.Atoi(parts[1])
-				w, err3 := strconv.Atoi(parts[2])
-				h, err4 := strconv.Atoi(parts[3])
-				
-				if err1 != nil || err2 != nil || err3 != nil || err4 != nil {
-					pop.Show("Error: invalid number format")
-					return
-				}
-				
-				drawBox(cv, x, y, w, h)
-				
-				pop.Show(fmt.Sprintf("Drew box at (%d,%d) size %dx%d", x, y, w, h))
-			})
-			return ""
+		"box": func (args []string) string {
+ 			// format: box <x> <y> <w> <h>
+			if len(args) < 5 {
+				return "Usage: box <x> <y> <w> <h>"
+			}
+			
+			x, err1 := strconv.Atoi(args[1])
+			y, err2 := strconv.Atoi(args[2])
+			w, err3 := strconv.Atoi(args[3])
+			h, err4 := strconv.Atoi(args[4])
+			
+			if err1 != nil || err2 != nil || err3 != nil || err4 != nil {
+				return "Error: invalid number format"
+			}
+			
+			drawBox(cv, x, y, w, h)
+			
+			return fmt.Sprintf("Box at (%d,%d) %dx%d", x, y, w, h)
 		},
 	}
 }
 
-func splitInput(input string) []string {
-	var parts []string
-	var current string
+func saveCanvas(cv *canvas.Canvas, filepath string) error {
+	file, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
 	
-	for _, ch := range input {
-		if ch == ' ' {
-			if current != "" {
-				parts = append(parts, current)
-				current = ""
+	for _, row := range cv.Data {
+		for _, ch := range row {
+			if _, err := file.WriteString(string(ch)); err != nil {
+				return err
 			}
-		} else {
-			current += string(ch)
+		}
+		if _, err := file.WriteString("\n"); err != nil {
+			return err
 		}
 	}
 	
-	if current != "" {
-		parts = append(parts, current)
+	return nil
+}
+
+func loadCanvas(cv *canvas.Canvas, filepath string) error {
+	data, err := os.ReadFile(filepath)
+	if err != nil {
+		return err
 	}
 	
-	return parts
+	lines := [][]rune{}
+	currentLine := []rune{}
+	
+	for _, ch := range string(data) {
+		if ch == '\n' {
+			lines = append(lines, currentLine)
+			currentLine = []rune{}
+		} else {
+			currentLine = append(currentLine, ch)
+		}
+	}
+	
+	// 最後の行が改行で終わっていない場合
+	if len(currentLine) > 0 {
+		lines = append(lines, currentLine)
+	}
+	
+	// キャンバスに適用
+	for i := 0; i < cv.Height && i < len(lines); i++ {
+		for j := 0; j < cv.Width && j < len(lines[i]); j++ {
+			cv.Data[i][j] = lines[i][j]
+		}
+		// 行が短い場合は空白で埋める
+		for j := len(lines[i]); j < cv.Width; j++ {
+			cv.Data[i][j] = ' '
+		}
+	}
+	
+	// ファイルの行数がキャンバスより少ない場合は空白で埋める
+	for i := len(lines); i < cv.Height; i++ {
+		for j := 0; j < cv.Width; j++ {
+			cv.Data[i][j] = ' '
+		}
+	}
+	
+	return nil
+}
+
+func drawRect(cv *canvas.Canvas, x, y, w, h int, char rune) {
+	for dy := 0; dy < h; dy++ {
+		for dx := 0; dx < w; dx++ {
+			nx, ny := x+dx, y+dy
+			if nx >= 0 && nx < cv.Width && ny >= 0 && ny < cv.Height {
+				cv.Data[ny][nx] = char
+			}
+		}
+	}
 }
 
 func drawLine(cv *canvas.Canvas, x1, y1, x2, y2 int, char rune) {
