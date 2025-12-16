@@ -115,8 +115,9 @@ func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup
 	// ---- ポップアップ ----
 	if pop.Visible {
 		lines := strings.Split(pop.Message, "\n")
+		ctrl := "OK (Enter)"
 		w := 4
-		h := 2 + len(lines)
+		h := 1 + len(lines)
 		for _, l := range lines {
 			if len(l)+4 > w {
 				w = len(l) + 4
@@ -125,6 +126,9 @@ func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup
 		px := (sw - w) / 2
 		py := (sh - h) / 2
 
+		tx := px+(w/2)-(len(ctrl)/2)
+		ty := py+h
+
 		style := tcell.StyleDefault.
 			Background(tcell.ColorWhite).
 			Foreground(tcell.ColorBlack)
@@ -132,12 +136,12 @@ func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup
 		// 枠
 		for x := 0; x < w; x++ {
 			s.SetContent(px+x, py, '─', nil, style)
-			s.SetContent(px+x, py+h-1, '─', nil, style)
+			s.SetContent(px+x, py+h, '─', nil, style)
 		}
 		s.SetContent(px, py, '┌', nil, style)
 		s.SetContent(px+w-1, py, '┐', nil, style)
-		s.SetContent(px, py+h-1, '└', nil, style)
-		s.SetContent(px+w-1, py+h-1, '┘', nil, style)
+		s.SetContent(px, py+h, '└', nil, style)
+		s.SetContent(px+w-1, py+h, '┘', nil, style)
 
 		for n, ms := range lines {
 			s.SetContent(px, py+n+1, '│', nil, style)
@@ -151,6 +155,10 @@ func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup
 					s.SetContent(px+2+i, py+1+n, ' ', nil, style)
 				}
 			}
+		}
+
+		for i, r := range ctrl {
+			s.SetContent(tx+i, ty, r, nil, style)
 		}
 	}
 

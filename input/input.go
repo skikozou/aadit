@@ -23,9 +23,7 @@ func HandleEvent(ev *tcell.EventKey, cv *canvas.Canvas, con *command.Console, po
 		case tcell.KeyEscape:
 			dlg.Hide()
 		case tcell.KeyEnter:
-			// ダイアログの結果を返すために、何らかのコールバックが必要
-			// ここではとりあえずHideするだけ
-			return true
+			dlg.Hide()
 		case tcell.KeyBackspace, tcell.KeyBackspace2:
 			dlg.Backspace()
 		case tcell.KeyRune:
@@ -34,9 +32,8 @@ func HandleEvent(ev *tcell.EventKey, cv *canvas.Canvas, con *command.Console, po
 		return true
 	}
 
-	// ポップアップ表示中は ESC で閉じるだけ
 	if pop.Visible {
-		if ev.Key() == tcell.KeyEscape {
+		if ev.Key() == tcell.KeyEscape || ev.Key() == tcell.KeyEnter {
 			pop.Hide()
 		}
 		return true

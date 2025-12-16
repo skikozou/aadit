@@ -25,9 +25,9 @@ func Customize(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *pop
 			return "help - show this message\nfill [text] - fill canvas by text"
 		},
 		"dlg": func ([]string) string {
-			
+			dlg.Show("How old are you?")
 		
-			return ""
+			return dlg.GetInput()
 		},
 	}
 }
