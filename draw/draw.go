@@ -76,6 +76,9 @@ func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup
 		style := tcell.StyleDefault.
 			Background(tcell.ColorWhite).
 			Foreground(tcell.ColorBlack)
+		unstyle := tcell.StyleDefault.
+			Background(tcell.ColorBlack).
+			Foreground(tcell.ColorWhite)
 
 		// 枠
 		for x := 0; x < w; x++ {
@@ -91,6 +94,8 @@ func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup
 		for y := 1; y < h-1; y++ {
 			s.SetContent(px, py+y, '│', nil, style)
 			s.SetContent(px+w-1, py+y, '│', nil, style)
+			s.SetContent(px+1, py+y, ' ', nil, style)
+			s.SetContent(px+w-2, py+y, ' ', nil, style)
 		}
 
 		// プロンプト
@@ -105,9 +110,9 @@ func DrawAll(s tcell.Screen, cv *canvas.Canvas, con *command.Console, pop *popup
 		// 入力欄
 		for i := 0; i < w-4; i++ {
 			if i < len(dlg.Buffer) {
-				s.SetContent(px+2+i, py+2, dlg.Buffer[i], nil, style)
+				s.SetContent(px+2+i, py+2, dlg.Buffer[i], nil, unstyle)
 			} else {
-				s.SetContent(px+2+i, py+2, ' ', nil, style)
+				s.SetContent(px+2+i, py+2, ' ', nil, unstyle)
 			}
 		}
 	}
