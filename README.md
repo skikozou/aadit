@@ -6,17 +6,17 @@ Simple Ascii Art Editor
 git clone https://github.com/skikozou/aadit
 cd aadit
 go get .
-go install .
+go build .
 ```
 
 # Usage
 ### Start
 ```
-aadit
+./aadit
 // or
-aadit {width} {height}
+./aadit {width} {height}
 // or
-aadit {width}x{height}
+./aadit {width}x{height}
 ```
 
 ### Move
