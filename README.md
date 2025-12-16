@@ -22,8 +22,16 @@ aadit {width}x{height}
 allow key ←→↑↓
 ```
 
+### Write
+```
+type character
+```
+
 ### Console
 ```
 ctrl + "/"
 type "help" and check commands
 ```
+
+# For Developer
+Edit custom.go and add your own functions!
