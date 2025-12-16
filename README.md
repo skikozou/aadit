@@ -31,7 +31,7 @@ aadit {width}x{height}
 
 ### Console
 ```
-ctrl + "/"
+// ctrl + "/"
 // type "help" and check commands
 ```
 
