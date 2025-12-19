@@ -57,6 +57,7 @@ func main() {
                 return
         }
         defer screen.Finish(s)
+        s.EnableMouse(tcell.MouseButtonEvents | tcell.MouseMotionEvents)
 
         if cw*ch == 0 {
         	width, height := s.Size()
@@ -76,9 +77,13 @@ func main() {
                 ev := s.PollEvent()
                 switch e := ev.(type) {
                 case *tcell.EventKey:
-                        if !input.HandleEvent(e, cv, con, pop, dlg) {
-                                return
+                        if !input.HandleKeyEvent(e, cv, con, pop, dlg) {
+							return
                         }
+                case *tcell.EventMouse:
+                		if !input.HandleMouseEvent(e, cv, con, pop, dlg) {
+                			return
+                		}
                 }
         }
 }

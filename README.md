@@ -37,3 +37,7 @@ go build .
 
 # For Developer
 Edit custom.go and add your own functions!
+
+# ToDo
+- split draw.go (make layout.go)
+- support to mouse input

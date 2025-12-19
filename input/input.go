@@ -9,7 +9,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-func HandleEvent(ev *tcell.EventKey, cv *canvas.Canvas, con *command.Console, pop *popup.Popup, dlg *dialog.Dialog) bool {
+func HandleKeyEvent(ev *tcell.EventKey, cv *canvas.Canvas, con *command.Console, pop *popup.Popup, dlg *dialog.Dialog) bool {
 
 	// Ctrl + /
 	if ev.Key() == tcell.KeyCtrlUnderscore {

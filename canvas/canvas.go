@@ -5,6 +5,8 @@ import "os"
 type Canvas struct {
 	Width  int
 	Height int
+	X      int
+	Y      int
 	Data   [][]rune
 	CX     int
 	CY     int
